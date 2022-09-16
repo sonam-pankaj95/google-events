@@ -9,11 +9,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-.rasa/
 models/
-/.rasa
 /models
-.rasa
 models
 develop-eggs/
 dist/
