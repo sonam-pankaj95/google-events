@@ -12,19 +12,24 @@ rules:
   - intent: bot_challenge
   - action: utter_iamabot
 
+- rule: get event
+  steps:
+  - intent: get_event
+  - action: action_get_event
+
 - rule: Activate form
   steps:
   - intent: add_event
-  - action: restaurant_form
-  - active_loop: restaurant_form
+  - action: event_form
+  - active_loop: event_form
 
 - rule: Submit form
   condition:
   # Condition that form is active.
-  - active_loop: restaurant_form
+  - active_loop: event_form
   steps:
   # Form is deactivated
-  - action: restaurant_form
+  - action: event_form
   - active_loop: null
   - slot_was_set:
     - requested_slot: null

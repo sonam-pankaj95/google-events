@@ -8,7 +8,7 @@
 # This is a simple example for a custom action which utters "Hello World!"
 from __future__ import print_function
 
-
+from rasa_sdk.events import AllSlotsReset
 from typing import Any, Text, Dict, List
 
 from rasa_sdk import Action, Tracker
@@ -57,14 +57,27 @@ class AddEventToCalendar(Action):
         time = tracker.get_slot('time')
         new_time = datetime.strptime(time, '%d/%m/%y %H:%M:%S')
 
-        print(new_time)
-
         add_event(event_name, new_time)
 
         dispatcher.utter_message(text="Event Added")
 
-        return []
+        return [AllSlotsReset()]
 
+class getEvent(Action):
+
+    def name(self) -> Text:
+        return "action_get_event"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        event_name = get_event()
+
+        print(event_name)
+        #confirmed_event = tracker.get_slot(Any)
+        dispatcher.utter_message(text="got events {name}".format(name= event_name))
+        return []
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -122,3 +135,47 @@ def add_event(event_name, time):
    print("summary: ", event_result['summary'])
    print("starts at: ", event_result['start']['dateTime'])
    print("ends at: ", event_result['end']['dateTime'])
+
+
+def get_event():
+
+    service = get_calendar_service() 
+    now = datetime.utcnow().isoformat() + 'Z'
+    events = service.events().list( calendarId='primary', timeMin=now,
+       maxResults=10, singleEvents=True,
+       orderBy='startTime').execute().get("items",[])
+
+    print(events[0]["summary"])
+    return events[0]["summary"]
+
+def do_event():
+
+    service = get_calendar_service() 
+    now = datetime.utcnow().isoformat() + 'Z'
+    events = service.events().list( calendarId='primary', timeMin=now,
+       maxResults=10, singleEvents=True,
+       orderBy='startTime').execute().get("items",[])
+
+    print(events[0]["end"])
+    return events[0]["end"]
+
+class ActionDoEvent(Action):
+
+    def name(self) -> Text:
+        return "action_do_event"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        event_name = do_event()
+
+        print(event_name)
+        #confirmed_event = tracker.get_slot(Any)
+        dispatcher.utter_message(text="got events {name}".format(name= event_name))
+        return []
+
+
+
+   
+ 
